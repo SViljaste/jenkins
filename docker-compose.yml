@@ -1,0 +1,29 @@
+version: "3.5"
+
+services:
+  jenkins:
+    image: jenkins/jenkins:2.426.3-lts-alpine
+    restart: always
+    container_name: jenkins
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - jenkins_slave:/var/jenkins_slave
+    ports:
+      - 127.0.0.1:8081:8080
+    healthcheck:
+      test: wget --spider http://127.0.0.1:8080/login
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      jenkins:
+
+volumes:
+  jenkins_home:
+  jenkins_slave:
+
+networks:
+  jenkins:
+    driver: bridge
+    name: jeknins
