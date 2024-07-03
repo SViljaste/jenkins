@@ -4,7 +4,7 @@
 
 - WebURL: http://localhost:8081/
 - User: admin
-- Password: konteineri käivitamise järgselt käsuga `docker compose -f docker-compose.yml up -d --build --force-recreate jenkins` käivita käsk `docker logs jenkins -f`, mis lubab vaadelda teenuse logi. Logisse tekib admin kasutaja jaoks genereeritud parool, mille abil saad keskkonda sisse.
+- Password: !READ doc "Create Jenkins container"!
 
 ## Step by step setup before creating Jenkins container
 
@@ -30,9 +30,14 @@ EOM
 source /etc/profile.d/java.sh
 ```
 
-## Create jenkins Container
+## Create Jenkins container
 
 `docker compose -f docker-compose.yml up -d --build --force-recreate jenkins`
+
+Login to Jnkins
+
+After creating a container with `docker compose -f docker-compose.yml up -d --build --force-recreate jenkins` you're required to give temporary token for server input from UI.
+After container is up and running execute: `docker logs jenkins -f` and fetch that token!
 
 ## Install missing plugins
 
