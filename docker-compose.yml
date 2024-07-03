@@ -6,8 +6,8 @@ services:
     restart: always
     container_name: jenkins
     volumes:
-      - jenkins_home:/var/jenkins_home
-      - jenkins_slave:/var/jenkins_slave
+      - /opt/jenkins_home:/var/jenkins_home
+      - /opt/jenkins_slave:/var/jenkins_slave
     ports:
       - 127.0.0.1:8081:8080
     healthcheck:
