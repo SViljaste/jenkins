@@ -11,11 +11,12 @@
 ```
 mkdir -p /opt/jenkins_home && chown 1000:1000 /opt/jenkins_home
 
-KEY="$(cat ./id_rsa.pub)"; ID="1001"; USERNAME="jenkins-slave"; NAME="Jenkins Slave"; KEY="${KEY}"; if grep -wq "${ID}\|${USERNAME}" /etc/group; then echo "${USERNAME} või GID ${ID} grupiga on midagi"; else groupadd -g ${ID} ${USERNAME}; fi; if grep -wq "${ID}\|${USERNAME}" /etc/passwd; then echo "${USERNAME} või UID ${ID} kasutajaga on midagi"; id ${USERNAME}; fi; if grep -wq 'sshusers' /etc/group; then echo "sshusers grupp on olemas"; grupid="sshusers"; echo $grupid; useradd -c "${NAME}" -s /bin/bash -u ${ID} -g ${ID} -G ${grupid} -d /home/${USERNAME} -m ${USERNAME} && mkdir /home/${USERNAME}/.ssh && echo "${KEY}" > /home/${USERNAME}/.ssh/authorized_keys && chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.ssh && chmod -R 700 /home/${USERNAME}/.ssh; id ${USERNAME}; else useradd -c "${NAME}" -s /bin/bash -u ${ID} -g ${ID} -d /home/${USERNAME} -m ${USERNAME} && mkdir /home/${USERNAME}/.ssh && echo "${KEY}" > /home/${USERNAME}/.ssh/authorized_keys && chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.ssh && chmod -R 700 /home/${USERNAME}/.ssh; id ${USERNAME}; fi;
+KEY="$(cat ./id_ed25519.pub)"; ID="1001"; USERNAME="jenkins-slave"; NAME="Jenkins Slave"; KEY="${KEY}"; if grep -wq "${ID}\|${USERNAME}" /etc/group; then echo "${USERNAME} või GID ${ID} grupiga on midagi"; else groupadd -g ${ID} ${USERNAME}; fi; if grep -wq "${ID}\|${USERNAME}" /etc/passwd; then echo "${USERNAME} või UID ${ID} kasutajaga on midagi"; id ${USERNAME}; fi; if grep -wq 'sshusers' /etc/group; then echo "sshusers grupp on olemas"; grupid="sshusers"; echo $grupid; useradd -c "${NAME}" -s /bin/bash -u ${ID} -g ${ID} -G ${grupid} -d /home/${USERNAME} -m ${USERNAME} && mkdir /home/${USERNAME}/.ssh && echo "${KEY}" > /home/${USERNAME}/.ssh/authorized_keys && chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.ssh && chmod -R 700 /home/${USERNAME}/.ssh; id ${USERNAME}; else useradd -c "${NAME}" -s /bin/bash -u ${ID} -g ${ID} -d /home/${USERNAME} -m ${USERNAME} && mkdir /home/${USERNAME}/.ssh && echo "${KEY}" > /home/${USERNAME}/.ssh/authorized_keys && chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.ssh && chmod -R 700 /home/${USERNAME}/.ssh; id ${USERNAME}; fi;
 
-cat ./id_rsa > /home/jenkins-slave/.ssh/id_rsa
+cat ./id_ed25519 > /home/jenkins-slave/.ssh/id_ed25519
 
-chmod 600 /home/jenkins-slave/.ssh/id_rsa && chown jenkins-slave:jenkins-slave /home/jenkins-slave/.ssh/id_rsa
+chmod 600 /home/jenkins-slave/.ssh/id_ed25519 && chown jenkins-slave:jenkins-slave /home/jenkins-slave/.ssh/id_ed25519
+
 mkdir /opt/jenkins_slave && chown -R jenkins-slave:jenkins-slave /opt/jenkins_slave -R
 
 usermod -aG docker jenkins-slave
@@ -145,7 +146,7 @@ Adds SSH server functionality to Jenkins, exposing CLI commands through it.
 Report an issue with this plugin
 ```
 
-## Configure your repo ing GitHub Nginx_Linux_Docker_www
+## Configure your GitHub repo Nginx_Linux_Docker_www
 
 Add SSH public key (https://github.com/SViljaste/jenkins/blob/main/id_ed25519.pub) for your repo: https://github.com/silving1/Nginx_Linux_Docker_www
 
@@ -153,12 +154,15 @@ Add SSH public key (https://github.com/SViljaste/jenkins/blob/main/id_ed25519.pu
 
 ### Change security settings
 
+```
 http://localhost:8081/manage/configureSecurity/
 Host Key Verification Strategy -> No verification
 click Save
+```
 
 ### Create nad configure new Jenkins agent
 
+```
 http://localhost:8081/manage/computer/
 click New Node
 Node name -> jenkins-slave
@@ -186,9 +190,11 @@ Connection Timeout in Seconds -> 60
 Maximum Number of Retries -> 3
 Seconds To Wait Between Retries -> 5
 click Save (at the end of the page)
+```
 
 ### Create new boilerplate for pipeline
 
+```
 click Dashboard
 click New Item
 Enter an item name -> www
@@ -207,5 +213,4 @@ click Add
 copy key from https://github.com/SViljaste/jenkins/blob/main/id_ed25519 and paste to Jenkins
 click Add
 Under "SCM" -> "Repositories" -> "Credentials", choose: jenkins (SSH private key for github.com)
-
-
+```
