@@ -155,15 +155,25 @@ Add SSH public key (https://github.com/SViljaste/jenkins/blob/main/id_ed25519.pu
 ### Change security settings
 
 ```
-http://localhost:8081/manage/configureSecurity/
+Go to http://localhost:8081/manage/configureSecurity/
 Host Key Verification Strategy -> No verification
 click Save
 ```
 
-### Create nad configure new Jenkins agent
+### Create and configure new Jenkins agent
+
+Your eth0 network adapter IP address is required: (in my case, example: 172.27.235.130)
+Let's fetch IP (ex when using WSL2):
+```
+[silvvi@localhost][2024-07-05 17:03:55][~/internship/jenkins]$ ifconfig |grep -A1 eth0
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.27.235.130  netmask 255.255.240.0  broadcast 172.27.239.255
+```
+
+Configure Jenkins agent:
 
 ```
-http://localhost:8081/manage/computer/
+Go to http://localhost:8081/manage/computer/
 click New Node
 Node name -> jenkins-slave
 Type -> Permanent Agent
@@ -191,6 +201,22 @@ Maximum Number of Retries -> 3
 Seconds To Wait Between Retries -> 5
 click Save (at the end of the page)
 ```
+
+Lets check if Agent is alive:
+
+Go to http://localhost:8081/manage/computer/
+click  jenkins-slave -> Logs
+
+Expected result in log:
+```
+<===[JENKINS REMOTING CAPACITY]===>channel started
+Remoting version: 3160.vd76b_9ddd10cc
+Launcher: SSHLauncher
+Communication Protocol: Standard in/out
+This is a Unix agent
+Agent successfully connected and online
+```
+
 
 ### Create new boilerplate for pipeline
 
