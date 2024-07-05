@@ -22,6 +22,8 @@ usermod -aG docker jenkins-slave
 
 wget -O /opt/OpenJDK21U-jdk_x64_linux_hotspot_21.0.3_9.tar.gz https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jdk_x64_linux_hotspot_21.0.3_9.tar.gz && tar -xvf /opt/OpenJDK21U-jdk_x64_linux_hotspot_21.0.3_9.tar.gz -C /opt/ && rm -f /opt/OpenJDK21U-jdk_x64_linux_hotspot_21.0.3_9.tar.gz
 
+ln -s /opt/jdk-21.0.3+9/bin/java /usr/local/bin/java
+
 sudo tee /etc/profile.d/java.sh<<EOM
 JAVA_HOME="/opt/jdk-21.0.3+9"
 export PATH=$JAVA_HOME/bin:$PATH
@@ -34,7 +36,7 @@ source /etc/profile.d/java.sh
 
 `docker compose -f docker-compose.yml up -d --build --force-recreate jenkins`
 
-Login to Jnkins
+Login to Jenkins
 
 After creating a container with `docker compose -f docker-compose.yml up -d --build --force-recreate jenkins` you're required to give temporary token for server input from UI.
 After container is up and running execute: `docker logs jenkins -f` and fetch that token!
@@ -142,3 +144,68 @@ Version3.322.v159e91f6a_550
 Adds SSH server functionality to Jenkins, exposing CLI commands through it.
 Report an issue with this plugin
 ```
+
+## Configure your repo ing GitHub Nginx_Linux_Docker_www
+
+Add SSH public key (https://github.com/SViljaste/jenkins/blob/main/id_ed25519.pub) for your repo: https://github.com/silving1/Nginx_Linux_Docker_www
+
+## Configure Jenkins UI
+
+### Change security settings
+
+http://localhost:8081/manage/configureSecurity/
+Host Key Verification Strategy -> No verification
+click Save
+
+### Create nad configure new Jenkins agent
+
+http://localhost:8081/manage/computer/
+click New Node
+Node name -> jenkins-slave
+Type -> Permanent Agent
+click Create
+Number of executors -> 2
+Remote root directory -> /opt/jenkins_slave
+Labels -> jenkins-slave
+Launch method -> Launch agents via SSH
+Host -> 172.27.235.130
+Credentials -> 
+click Add then Jenkins
+Kind -> SSH Username with private key
+Scope -> System (Jenkins and nodes only)
+Description -> SSH private key for Jenkins Slave connection user in local Jenkins Slave agent.
+Username -> jenkins-slave
+Private Key -> Enter directly
+click Add
+copy key from https://github.com/SViljaste/jenkins/blob/main/id_ed25519 and paste to Jenkins
+click Add
+Under "Launch method" -> "Credentials", choose: jenkins-slave
+Host Key Verification Strategy -> Non verifying Verification Strategy
+click Advanced
+Connection Timeout in Seconds -> 60
+Maximum Number of Retries -> 3
+Seconds To Wait Between Retries -> 5
+click Save (at the end of the page)
+
+### Create new boilerplate for pipeline
+
+click Dashboard
+click New Item
+Enter an item name -> www
+choose "Pipeline"
+click OK
+Under Pipeline -> Definition, choose: Pipeline script from SCM
+SCM -> Git
+Repository URL -> ssh://git@github.com/silving1/Nginx_Linux_Docker_www.git
+Credentials ->
+click Add then Jenkins
+Kind -> SSH Username with private key
+Description -> SSH private key for github.com
+Username -> jenkins-slave
+Private Key -> Enter directly
+click Add
+copy key from https://github.com/SViljaste/jenkins/blob/main/id_ed25519 and paste to Jenkins
+click Add
+Under "SCM" -> "Repositories" -> "Credentials", choose: jenkins (SSH private key for github.com)
+
+
