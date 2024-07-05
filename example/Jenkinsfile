@@ -1,0 +1,51 @@
+#!groovy
+
+/* Jenkins documentation: https://www.jenkins.io/doc/book/pipeline/ */
+pipeline {
+/* Selle kommentaari järgi lisame rea Jenkins agendi välja kutsumiseks atribuudi abil (label). Adribuudi määrasime agendi konfiguratsiooni sammus. */
+/* PLACEHOLDER FOR AGENT DECLARATION BY LABEL */
+  options {
+    timeout(time: 1, unit: 'HOURS')
+    buildDiscarder(logRotator(numToKeepStr: '5', daysToKeepStr: '5'))
+    disableConcurrentBuilds()
+    preserveStashes(buildCount: 5)
+  }
+  stages {
+    stage('Setup Parameters 🏷️') {
+      steps {
+/* Selle kommentaari järgi lisame read muutujate ja parameetrite määramiseks script{} sektsioonis . Vajame kahte parameetrit: APPLICATION_NAME = 'www' ja DESTINATION_HOST = '<eth0 võrguadapteri IP aadress>' */
+/* PLACEHOLDER FOR DECLARING PIPELINE PARAMETERS INSIDE script{} */
+      }
+    }
+    stage('Source Code Checkout 🧾') {
+      steps {
+        script {
+/* Selle kommentaari järel on deklareeritud SSH agent, mis võtab sisendiks SSH võtme credential ID (tegime seda pipeline boilerplate loomise faasis). ID leiame kui liigume Jenkins UI's: http://localhost:8081/manage/credentials/ */
+          sshagent(['<LISA SIIA credentialsId>']) {
+            def scmVars = checkout(scm: scm, poll: false)
+            env.GIT_COMMIT = scmVars.GIT_COMMIT
+          }
+          println "${env.GIT_COMMIT}"
+        }
+      }
+    }
+/* Selle kommentaari järgi lisame www rakenduse ehitamiseks vajalikud sh käsud stage('Deploy www 🚀') {} sektsioonis.
+1. sh käsk: loome sihtkohta kataloogi asukoha ja nimega: /opt/${env.APPLICATION_NAME}, tehes seda üle SSH ühenduse, näide: ssh jenkins-slave@@${DESTINATION_HOST} '<kataloogi loomise käsk>'
+2. sh käsk: kopeerime kogu kataloogi Nginx_Linux_Docker_www sisu üle SSH ühenduse asukohta /opt/${env.APPLICATION_NAME}. Vihje: Linuxi programm scp on siin abiks.
+3. sh käsk: käivitame üle SSH ühenduse docker-compose programmi abil www rakenduse nagu tegime seda www rakenduse projekti loomise faasis.
+*/
+/* PLACEHOLDER FOR DECLARING DEPLOYMENT STAGE INSIDE stage() {} */
+  }
+  post {
+    always {
+      cleanWs()
+    }
+    failure {
+      println "Build Failed"
+    }
+    success {
+      println "Build Successful"
+    }
+  }
+}
+

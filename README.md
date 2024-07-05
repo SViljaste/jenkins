@@ -11,6 +11,8 @@
 ```
 mkdir -p /opt/jenkins_home && chown 1000:1000 /opt/jenkins_home
 
+chmod 757 /opt
+
 KEY="$(cat ./id_ed25519.pub)"; ID="1001"; USERNAME="jenkins-slave"; NAME="Jenkins Slave"; KEY="${KEY}"; if grep -wq "${ID}\|${USERNAME}" /etc/group; then echo "${USERNAME} või GID ${ID} grupiga on midagi"; else groupadd -g ${ID} ${USERNAME}; fi; if grep -wq "${ID}\|${USERNAME}" /etc/passwd; then echo "${USERNAME} või UID ${ID} kasutajaga on midagi"; id ${USERNAME}; fi; if grep -wq 'sshusers' /etc/group; then echo "sshusers grupp on olemas"; grupid="sshusers"; echo $grupid; useradd -c "${NAME}" -s /bin/bash -u ${ID} -g ${ID} -G ${grupid} -d /home/${USERNAME} -m ${USERNAME} && mkdir /home/${USERNAME}/.ssh && echo "${KEY}" > /home/${USERNAME}/.ssh/authorized_keys && chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.ssh && chmod -R 700 /home/${USERNAME}/.ssh; id ${USERNAME}; else useradd -c "${NAME}" -s /bin/bash -u ${ID} -g ${ID} -d /home/${USERNAME} -m ${USERNAME} && mkdir /home/${USERNAME}/.ssh && echo "${KEY}" > /home/${USERNAME}/.ssh/authorized_keys && chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.ssh && chmod -R 700 /home/${USERNAME}/.ssh; id ${USERNAME}; fi;
 
 cat ./id_ed25519 > /home/jenkins-slave/.ssh/id_ed25519
@@ -240,3 +242,7 @@ copy key from https://github.com/SViljaste/jenkins/blob/main/id_ed25519 and past
 click Add
 Under "SCM" -> "Repositories" -> "Credentials", choose: jenkins (SSH private key for github.com)
 ```
+
+### Exercise - Jenkinsfile
+
+Fulfill tasks described in file example/Jenkinsfile. Copy this file inside your project "Nginx_Linux_Docker_www" root path and commit to repository.
